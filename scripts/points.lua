@@ -1,4 +1,4 @@
--- Emit time (seconds), latency (millis) data points prefixed with "===" (for grepping)
+-- Emit time, latency (seconds) data points prefixed with "===" (for grepping)
 
 local start
 local stop
