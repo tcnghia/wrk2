@@ -17,6 +17,7 @@ static struct config {
     uint64_t pipeline;
     uint64_t rate;
     uint64_t delay_ms;
+    bool     raw;
     bool     latency;
     bool     u_latency;
     bool     dynamic;
@@ -52,6 +53,7 @@ static void handler(int sig) {
 static void usage() {
     printf("Usage: wrk <options> <url>                            \n"
            "  Options:                                            \n"
+           "    -a, --all         <N>  Record raw value           \n"
            "    -c, --connections <N>  Connections to keep open   \n"
            "    -d, --duration    <T>  Duration of test           \n"
            "    -t, --threads     <N>  Number of threads to use   \n"
@@ -162,6 +164,7 @@ int main(int argc, char **argv) {
     printf("Running %s test @ %s\n", time, url);
     printf("  %"PRIu64" threads and %"PRIu64" connections\n",
             cfg.threads, cfg.connections);
+    if (cfg.raw) printf("raw:true\n");
 
     uint64_t start    = time_us();
     uint64_t complete = 0;
@@ -556,6 +559,10 @@ static int response_complete(http_parser *parser) {
 
         uint64_t actual_latency_timing = now - c->actual_latency_start;
         hdr_record_value(thread->u_latency_histogram, actual_latency_timing);
+
+        if (cfg.raw) {
+          printf("===DATA_POINT===,%" PRId64 ",%" PRId64 "\n", c->actual_latency_start, actual_latency_timing);
+        }
     }
 
 
@@ -692,6 +699,7 @@ static char *copy_url_part(char *url, struct http_parser_url *parts, enum http_p
 }
 
 static struct option longopts[] = {
+    { "all",            no_argument,       NULL, 'a' },
     { "connections",    required_argument, NULL, 'c' },
     { "duration",       required_argument, NULL, 'd' },
     { "threads",        required_argument, NULL, 't' },
@@ -718,8 +726,11 @@ static int parse_args(struct config *cfg, char **url, struct http_parser_url *pa
     cfg->rate        = 0;
     cfg->record_all_responses = true;
 
-    while ((c = getopt_long(argc, argv, "t:c:d:s:H:T:R:LUBrv?", longopts, NULL)) != -1) {
+    while ((c = getopt_long(argc, argv, "t:c:d:s:H:T:R:LUBrva?", longopts, NULL)) != -1) {
         switch (c) {
+            case 'a':
+                cfg->raw = true;
+                break;
             case 't':
                 if (scan_metric(optarg, &cfg->threads)) return -1;
                 break;
