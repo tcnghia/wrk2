@@ -1,23 +1,13 @@
--- Emit time, latency (seconds) data points prefixed with "===" (for grepping)
-
-local start
-local stop
+-- Emit a few stats prefixed with "===" (for grepping)
 
 math.randomseed(os.time())
 
--- Keep track of when clients come online so total concurrent clients can be calculated.
+-- Emit a stat with unique client ID each time a thread comes online.
 setup =  function(thread)
-   thread:set("id", "client-" .. math.floor(math.random() * 1000000))
-   io.write("===CLIENT_ONLINE=== " .. os.time() .. " " .. thread:get("id") .. " "  .. "\n")
+   io.write("===CLIENT=== " .. os.time() .. " " .. math.floor(math.random() * 1000000) .. " "  .. "\n")
 end
 
-request = function()
-   start = os.clock()
-   return wrk.format()
-end
-
--- Emit each request as a time, latency data point.
+-- Emit the HTTP status for each request.
 response = function(status, headers, body)
-   stop = os.clock()
-   io.write("===DATA_POINT=== " .. os.time() .. " " .. stop*1000-start*1000 .. " " .. status .. "\n")
+   io.write("===STATUS=== " .. os.time() .. " " .. status .. "\n")
 end

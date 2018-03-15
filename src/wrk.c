@@ -560,8 +560,9 @@ static int response_complete(http_parser *parser) {
         uint64_t actual_latency_timing = now - c->actual_latency_start;
         hdr_record_value(thread->u_latency_histogram, actual_latency_timing);
 
+        // Print latency stats prefixed with "===" (for grepping).
         if (cfg.raw) {
-          printf("===DATA_POINT===,%" PRId64 ",%" PRId64 "\n", c->actual_latency_start, actual_latency_timing);
+          printf("===LATENCY=== %" PRId64 " %" PRId64 "\n", c->actual_latency_start, actual_latency_timing);
         }
     }
 
