@@ -1,13 +1,19 @@
 -- Emit a few stats prefixed with "===" (for grepping)
 
-math.randomseed(os.time())
+local thread_count = 0
 
--- Emit a stat with unique client ID each time a thread comes online.
+-- Emit a stat each time a thread comes online
 setup =  function(thread)
-   io.write("===CLIENT=== " .. os.time() .. " " .. math.floor(math.random() * 1000000) .. " "  .. "\n")
+   thread_count = thread_count + 1
+   io.write("===CLIENT=== " .. os.time() .. " 1"  .. "\n")
 end
 
 -- Emit the HTTP status for each request.
 response = function(status, headers, body)
    io.write("===STATUS=== " .. os.time() .. " " .. status .. "\n")
+end
+
+-- Emit a stat after all threads go offline
+done = function()
+   io.write("===CLIENT=== " .. os.time() .. " -" .. thread_count .. "\n")
 end
