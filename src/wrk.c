@@ -562,7 +562,7 @@ static int response_complete(http_parser *parser) {
 
         // Print latency stats prefixed with "===" (for grepping).
         if (cfg.raw) {
-          printf("===LATENCY=== %" PRId64 " %" PRId64 "\n", c->actual_latency_start, actual_latency_timing);
+            printf("===LATENCY=== %" PRId64 " %" PRId64 "\n", c->start, now - c->start);
         }
     }
 
