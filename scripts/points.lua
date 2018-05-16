@@ -10,7 +10,7 @@ end
 
 -- Emit the HTTP status for each request.
 response = function(status, headers, body)
-   io.write("===STATUS=== " .. os.time() .. " " .. status .. "\n")
+   io.write("===STATUS=== " .. os.time() .. " " .. status .. body .. "\n")
 end
 
 -- Emit a stat after all threads go offline
